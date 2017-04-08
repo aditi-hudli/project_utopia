@@ -1,0 +1,113 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+    <title>Utopia</title>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var game = new Phaser.Game(700, 650, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+function preload() {
+
+    game.load.image('sky', 'assets/sky.png');
+    game.load.image('ground', 'assets/platform.png');
+    game.load.image('star', 'assets/star.png');
+    game.load.image('redcross','assets/firstaid.png');
+    game.load.image('next','assets/icon-arrow-right.png');
+    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+
+}
+
+var player, platforms, cursors, introText, infoText, next_btn, counter=0,temp;
+
+function create() {
+
+    
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.add.sprite(0, 0, 'sky');
+    
+    platforms = game.add.group();
+    platforms.enableBody = true;
+    var ground = platforms.create(0, game.world.height - 64, 'ground');
+    ground.scale.setTo(2, 2);
+    ground.body.immovable = true;
+
+   
+    player = game.add.sprite(300, game.world.height - 150, 'dude');
+    game.physics.arcade.enable(player);
+    player.body.bounce.y = 0.1;
+    player.body.gravity.y = 1000;
+    player.body.collideWorldBounds = true;
+    player.animations.add('left', [0, 1, 2, 3], 10, true);
+    player.animations.add('right', [5, 6, 7, 8], 10, true);
+    player.scale.setTo(1.5,1.5);
+    
+    game.camera.follow(player);
+  
+    introText = game.add.text(game.world.centerX, 400, '- click to start -', { font: "40px Lucida Console", fill: "#551133", align: "center" });
+    introText.anchor.setTo(0.5, 0.5);
+    
+    //  Our controls.
+    cursors = game.input.keyboard.createCursorKeys();
+    game.input.onDown.add(removeLogo,this);
+    
+    //note about variables and adding the next button
+    infoText = game.add.text(game.world.topX,20,'In computer programming, a variable or scalar is a storage \nlocation paired with an associated symbolic name (an iden\ntifier), which contains some known or unknown quantity of \ninformation referred to as a value.',{ font: "20px Lucida Console", fill: "#551133", align: "left" });
+    infoText.visible = false;
+}
+
+function update() {
+
+    game.physics.arcade.collide(player, platforms);
+    player.body.velocity.x = 0;
+
+    if (cursors.left.isDown)
+    {
+        player.body.velocity.x = -150;
+        player.animations.play('left');
+    }
+    else if (cursors.right.isDown)
+    {
+        player.body.velocity.x = 150;
+        player.animations.play('right');
+    }
+    else
+    {
+        player.animations.stop();
+        player.frame = 4;
+    }
+    if (cursors.up.isDown && player.body.touching.down)
+    {
+        player.body.velocity.y = -350;
+    }
+}
+function removeLogo(){
+    if(counter==0){
+        introText.visible = false;
+        infoText.visible = true;
+        counter=1;
+        next_btn = game.add.button(game.world.centerX + 220, 400, 'next', actionOnClick, this, 2, 1, 0);
+        next_btn.scale(0.01,0.01);
+    }
+        
+}
+function actionOnClick(){
+    infoText.visible = false;
+    var moreText = game.add.text(game.world.topX,20,'\n\nSo in simple words a variable can take on many different \nvalues throughout a program.\nYou can define a variable as follows:\n var star\n int x\n char word\n float num',{ font: "20px Lucida Console", fill: "#551133", align: "left" });
+    temp = game.add.sprite(320,game.world.height -160,'star');
+    game.add.sprite(100,game.world.height -100,'redcross');
+    temp.scale(2,2);
+}
+</script>
+
+</body>
+</html>
